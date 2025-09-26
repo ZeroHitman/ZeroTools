@@ -1,22 +1,22 @@
 #!/bin/bash
-# Script: setup-centos6-vault.sh
-# Deskripsi: Konfigurasi repo CentOS 6.10 Vault untuk yum
+# Script: migrate-to-vault.sh
+# Deskripsi: Disable semua repo default CentOS 6 & aktifkan CentOS Vault 6.10
 
-# Pastikan root
 if [ "$EUID" -ne 0 ]; then
-  echo "Harus dijalankan sebagai root. Gunakan: sudo $0"
+  echo "Harus root. Jalankan dengan: sudo $0"
   exit 1
 fi
 
-echo ">> Menonaktifkan repo default (Base, Fasttrack, Media)..."
-for repo in CentOS-Base.repo CentOS-fasttrack.repo CentOS-Media.repo; do
-  if [ -f "/etc/yum.repos.d/$repo" ]; then
-    sed -i 's/enabled=1/enabled=0/g' "/etc/yum.repos.d/$repo"
-    echo "   - $repo dinonaktifkan"
-  fi
+echo "[INFO] Backup repo lama ke /etc/yum.repos.d/backup"
+mkdir -p /etc/yum.repos.d/backup
+cp -a /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup/
+
+echo "[INFO] Disable semua repo lama..."
+for repo in /etc/yum.repos.d/*.repo; do
+  sed -i 's/enabled=1/enabled=0/g' "$repo"
 done
 
-echo ">> Membuat file repo: /etc/yum.repos.d/CentOS-Vault.repo"
+echo "[INFO] Menambahkan repo CentOS Vault 6.10..."
 cat > /etc/yum.repos.d/CentOS-Vault.repo <<'EOF'
 [base]
 name=CentOS-6.10 - Base
@@ -40,10 +40,12 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
 enabled=1
 EOF
 
-echo ">> Membersihkan cache yum..."
+echo "[INFO] Bersihin cache yum..."
 yum clean all
 
-echo ">> Membuat cache baru..."
-yum makecache
+echo "[INFO] Daftar repo aktif sekarang:"
+yum repolist
 
-echo ">> Selesai! Sekarang Anda bisa menjalankan 'yum update'"
+echo
+echo "✅ Semua repo lama di-disable, repo Vault 6.10 aktif"
+echo "Sekarang bisa langsung: yum update"
