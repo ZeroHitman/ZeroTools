@@ -8,10 +8,10 @@ fi
 
 echo "[INFO] Backup semua repo lama..."
 mkdir -p /etc/yum.repos.d/backup
-mv /etc/yum.repos.d/CentosOs-*.repo /etc/yum.repos.d/backup/ 2>/dev/null || true
+mv /etc/yum.repos.d/CentOS-*.repo /etc/yum.repos.d/backup/ 2>/dev/null || true
 
 echo "[INFO] Buat repo baru Vault CentOS 6.10..."
-cat > /etc/yum.repos.d/CentosOs-Vault.repo <<'EOF'
+cat > /etc/yum.repos.d/CentOS-Vault.repo <<'EOF'
 [base]
 name=CentOS-6.10 - Base
 baseurl=http://vault.centos.org/6.10/os/$basearch/
