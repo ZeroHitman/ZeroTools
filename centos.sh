@@ -1,26 +1,17 @@
 #!/bin/bash
-# Script: force-vault-centos6.sh
-# Tujuan: disable mirrorlist & pakai vault.centos.org
+# Script: fix-centos6-repo.sh
 
 if [ "$EUID" -ne 0 ]; then
-  echo "Harus root. Jalankan dengan: sudo $0"
+  echo "Harus root. Jalankan pakai: sudo $0"
   exit 1
 fi
 
-echo "[INFO] Backup repo lama ke /etc/yum.repos.d/backup"
+echo "[INFO] Backup semua repo lama..."
 mkdir -p /etc/yum.repos.d/backup
-cp -a /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup/
+mv /etc/yum.repos.d/CentosOs-*.repo /etc/yum.repos.d/backup/ 2>/dev/null || true
 
-echo "[INFO] Hapus semua baris mirrorlist= dari repo lama..."
-sed -i '/mirrorlist=/d' /etc/yum.repos.d/*.repo
-
-echo "[INFO] Matikan semua repo lama..."
-for repo in /etc/yum.repos.d/*.repo; do
-  sed -i 's/enabled=1/enabled=0/g' "$repo"
-done
-
-echo "[INFO] Buat ulang repo CentOS Vault 6.10..."
-cat > /etc/yum.repos.d/CentOS-Vault.repo <<'EOF'
+echo "[INFO] Buat repo baru Vault CentOS 6.10..."
+cat > /etc/yum.repos.d/CentosOs-Vault.repo <<'EOF'
 [base]
 name=CentOS-6.10 - Base
 baseurl=http://vault.centos.org/6.10/os/$basearch/
