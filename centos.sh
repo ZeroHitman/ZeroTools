@@ -1,15 +1,22 @@
 #!/bin/bash
 # Script: setup-centos6-vault.sh
-# Deskripsi: Menambahkan repo CentOS Vault 6.10 untuk yum
+# Deskripsi: Konfigurasi repo CentOS 6.10 Vault untuk yum
 
-# Cek apakah dijalankan sebagai root
+# Pastikan root
 if [ "$EUID" -ne 0 ]; then
   echo "Harus dijalankan sebagai root. Gunakan: sudo $0"
   exit 1
 fi
 
-echo "Membuat file repo: /etc/yum.repos.d/CentOS-Vault.repo..."
+echo ">> Menonaktifkan repo default (Base, Fasttrack, Media)..."
+for repo in CentOS-Base.repo CentOS-fasttrack.repo CentOS-Media.repo; do
+  if [ -f "/etc/yum.repos.d/$repo" ]; then
+    sed -i 's/enabled=1/enabled=0/g' "/etc/yum.repos.d/$repo"
+    echo "   - $repo dinonaktifkan"
+  fi
+done
 
+echo ">> Membuat file repo: /etc/yum.repos.d/CentOS-Vault.repo"
 cat > /etc/yum.repos.d/CentOS-Vault.repo <<'EOF'
 [base]
 name=CentOS-6.10 - Base
@@ -33,5 +40,10 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
 enabled=1
 EOF
 
-echo "Repo CentOS Vault 6.10 berhasil dibuat!"
-echo "Sekarang jalankan: yum clean all && yum update"
+echo ">> Membersihkan cache yum..."
+yum clean all
+
+echo ">> Membuat cache baru..."
+yum makecache
+
+echo ">> Selesai! Sekarang Anda bisa menjalankan 'yum update'"
