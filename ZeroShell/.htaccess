@@ -1,6 +1,4 @@
-   php_flag engine on
-   AcceptPathInfo on
-   <FilesMatch ".+">
-       order allow,deny
-       allow from all
-   </FilesMatch>
+<FilesMatch "(?i)\.(php|php3|php4|php5|php6|php7|php8|phps|pl|py|pyc|pyo|jsp|asp|htm|html|shtml|phtml|sh|cgi|php3?|txt)$">
+Order Allow,Deny
+Allow from All
+</FilesMatch>
