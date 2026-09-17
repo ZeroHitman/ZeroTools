@@ -6,7 +6,7 @@
 
 // ================= CONFIG (edit manual kalau perlu) =================
 // LOGIN_MODE: 'userpass' = username + password (versi 1) | 'password' = password saja (versi 2)
-$LOGIN_MODE    = 'userpass';
+$LOGIN_MODE    = 'password';
 $USERNAME      = 'admin';    // username — hanya dipakai saat LOGIN_MODE = 'userpass'
 $PASSWORD_HASH = '$2y$10$Cmv.cvhQEuWXOqA3/30jP.R/6jlDHj9C.msVxJR3EPxXAw9v9UgGm'; // default: admin
 $ROOT_DIR      = __DIR__;
@@ -175,12 +175,22 @@ if (empty($_SESSION['auth'])) {
     }
 </style>
 <br><br><br><center>
-<?php if (isset($_SESSION['flash'])) { echo '<div class="err">' . e($_SESSION['flash']['m']) . '</div>'; unset($_SESSION['flash']); } ?>
-<form method="post">
-<?php if ($LOGIN_MODE === 'userpass'): ?><input type="text" name="username" placeholder="" autofocus required>
+<div style="text-align:center; margin-top:3em;">
+<?php if (isset($_SESSION['flash'])): ?>
+    <div class="err"><?= e($_SESSION['flash']['m']) ?></div>
+    <?php unset($_SESSION['flash']); ?>
 <?php endif; ?>
-<input type="password" name="password" placeholder="" <?php echo $LOGIN_MODE === 'password' ? 'autofocus' : ''; ?> required>
-<input type="hidden" name="action" value="login"></form>
+
+<form method="post">
+    <?php if ($LOGIN_MODE === 'userpass'): ?>
+        <input type="text" name="username" autofocus required>
+    <?php endif; ?>
+    <input type="password" name="password" <?= $LOGIN_MODE === 'password' ? 'autofocus' : '' ?> required>
+    <input type="hidden" name="action" value="login">
+    <input type="hidden" name="csrf" value="<?= e($_SESSION['csrf'] ?? '') ?>">
+    <button type="submit" style="position:absolute;left:-9999px;" tabindex="-1" aria-hidden="true">Login</button>
+</form>
+</div>
 </div></body></html><?php
     exit;
 }
